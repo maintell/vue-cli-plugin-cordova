@@ -18,7 +18,9 @@ const defaultModes = {
   'cordova-serve-electron': 'development',
   'cordova-build-electron': 'production',
   'cordova-build-only-www-ios': 'production',
+  'cordova-build-only-www-ios-beta': 'production',
   'cordova-build-only-www-android': 'production',
+  'cordova-build-only-www-android-beta': 'production',
   'cordova-build-only-www-browser': 'production',
   'cordova-build-only-www-osx': 'production',
   'cordova-build-only-www-electron': 'production',
@@ -245,6 +247,17 @@ module.exports = (api, options) => {
     // add www/.gitignore again (because build will delete it)
     addGitIgnoreToWWW()
   }
+  
+  const runWWWBuildBeta = async (platform, args) => {
+    // add cordova.js, define process.env.CORDOVA_PLATFORM
+    chainWebPack(platform)
+    // set build output folder
+    args.dest = cordovaPath + '/www/beta'
+    // build
+    await api.service.run('build', args)
+    // add www/.gitignore again (because build will delete it)
+    addGitIgnoreToWWW()
+  }
 
   const configureDevServer = platform => {
     api.configureDevServer(app => {
@@ -318,9 +331,17 @@ module.exports = (api, options) => {
   api.registerCommand('cordova-build-only-www-ios', async args => {
     return await runWWWBuild('ios', args)
   })
+  
+  api.registerCommand('cordova-build-only-www-ios-beta', async args => {
+    return await runWWWBuildBeta('ios', args)
+  })
 
   api.registerCommand('cordova-build-only-www-android', async args => {
     return await runWWWBuild('android', args)
+  })
+  
+  api.registerCommand('cordova-build-only-www-androidbeta', async args => {
+    return await runWWWBuildBeta('android', args)
   })
 
   api.registerCommand('cordova-build-only-www-browser', async args => {
