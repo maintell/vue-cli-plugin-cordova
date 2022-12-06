@@ -1,0 +1,39 @@
+@echo on
+CLS
+git restore .
+git checkout 4.8.1
+git pull
+CALL androidVersion.bat
+replace ./business/src/setting.js apiBaseURL:accUrl apiBaseURL:devUrl
+replace ./business/src/setting.js "apiBaseURL: accUrl" "apiBaseURL: devUrl"
+replace ./business/src/setting.js "apiBaseURL: darkUrl" "apiBaseURL: devUrl"
+replace ./business/src/setting.js "apiBaseURL: testUrl" "apiBaseURL: devUrl"
+replace ./business/src/setting.js "apiBaseURL:testUrl" "apiBaseURL: devUrl"
+replace ./business/src/setting.js "apiBaseURL: mitUrl" "apiBaseURL: devUrl"
+replace ./business/src/setting.js .dev .pro
+cd business
+echo Prepare Environment......
+echo build vue project......
+SET cordovaPath=src-cordova-acc
+CALL npm run cordova-build-only-www-android-acc
+echo 'Build sub directory now'
+CD ..
+git restore .
+git checkout 4.8.2
+git pull
+CALL androidVersion.bat
+replace ./business/src/setting.js apiBaseURL:accUrl apiBaseURL:darkUrl
+replace ./business/src/setting.js "apiBaseURL: accUrl" "apiBaseURL: darkUrl"
+replace ./business/src/setting.js "apiBaseURL: devUrl" "apiBaseURL: darkUrl"
+replace ./business/src/setting.js "apiBaseURL: testUrl" "apiBaseURL: darkUrl"
+replace ./business/src/setting.js "apiBaseURL:testUrl" "apiBaseURL: darkUrl"
+replace ./business/src/setting.js "apiBaseURL: mitUrl" "apiBaseURL: darkUrl"
+replace ./business/src/setting.js .pro .dev 
+
+CD business
+CALL npm run cordova-build-only-www-android-acc-beta
+CD ..
+replace  ./business/src-cordova-acc/www/beta/index.html  "<script src=cordova.js>" "<script src=../cordova.js></script><script src=../cordova_plugins.js>"
+
+CD business
+cd src-cordova-ios
